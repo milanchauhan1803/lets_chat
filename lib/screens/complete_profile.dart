@@ -9,6 +9,14 @@ class CompleteProfileScreen extends StatefulWidget {
 }
 
 class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
+
+
+  void showPhotoOptions(){
+      showDialog(context: context, builder: (context){
+        return AlertDialog(title: Text("Upload Profile picture"),);
+      });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +33,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 height: 25,
               ),
               CupertinoButton(
-                onPressed: (){},
+                onPressed: (){
+                  showPhotoOptions();
+                },
                 padding: EdgeInsets.zero,
                 child: CircleAvatar(
                     radius: 60,
