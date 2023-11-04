@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:lets_chat/models/firebase_helper.dart';
+import 'package:lets_chat/models/user_model.dart';
 import 'package:lets_chat/screens/complete_profile.dart';
 import 'package:lets_chat/screens/home_screen.dart';
 import 'package:lets_chat/screens/login_screen.dart';
@@ -7,9 +10,24 @@ import 'package:lets_chat/screens/login_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(const MyApp());
+
+  User? currentUser = FirebaseAuth.instance.currentUser;
+  if (currentUser != null) {
+    //Logged in
+    UserModel? userModel =
+        await FirebaseHelper.getUserModelById(currentUser.uid);
+    if (userModel != null) {
+      runApp(MyAppLoggedIn(userModel: userModel, firebaseUser: currentUser));
+    }else{
+      runApp(const MyApp());
+    }
+  } else {
+    //Not logged in
+    runApp(const MyApp());
+  }
 }
 
+//Not logged in
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -37,7 +55,28 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const CompleteProfileScreen(),
+      home: const LoginScreen(),
+    );
+  }
+}
+
+//Logged in
+class MyAppLoggedIn extends StatelessWidget {
+  final UserModel userModel;
+  final User firebaseUser;
+
+  const MyAppLoggedIn(
+      {super.key, required this.userModel, required this.firebaseUser});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: HomeScreen(userModel: userModel, firebaseUser: firebaseUser),
     );
   }
 }

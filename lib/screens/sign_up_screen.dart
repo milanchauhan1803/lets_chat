@@ -131,7 +131,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
             .collection("users")
             .doc(uId)
             .set(newUser.toMap())
-            .then((value) => Fluttertoast.showToast(msg: "New user created"));
+            .then(
+              (value) => Fluttertoast.showToast(msg: "New user created!"),
+            );
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext) => CompleteProfileScreen(
+                    userModel: newUser, firebaseUser: credential!.user!)));
       }
     } on FirebaseAuthException catch (e) {
       print("exception:- " + e.code.toString());

@@ -1,13 +1,24 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lets_chat/screens/home_screen.dart';
+
+import '../models/user_model.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
-  const CompleteProfileScreen({super.key});
+  final UserModel userModel;
+  final User firebaseUser;
+
+  const CompleteProfileScreen(
+      {super.key, required this.userModel, required this.firebaseUser});
 
   @override
   State<CompleteProfileScreen> createState() => _CompleteProfileScreenState();
@@ -25,17 +36,17 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     }
   }
 
-  void cropImage(XFile file) async {
-    var croppedImage = await ImageCropper().cropImage(
+  cropImage(XFile file) async {
+    CroppedFile? croppedImage = await ImageCropper.platform.cropImage(
       sourcePath: file.path,
-      aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1),
       compressQuality: 20,
+      aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
     );
 
     if (croppedImage != null) {
       setState(
         () {
-          imageFile = croppedImage as File;
+          imageFile = File(croppedImage.path);
         },
       );
     }
@@ -72,6 +83,43 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         });
   }
 
+  void checkValues() {
+    String fullname = fullNameController.text.trim();
+
+    if (fullname == "" || imageFile == null) {
+      Fluttertoast.showToast(msg: "Please fill all the fields");
+    } else {
+      uploadData();
+    }
+  }
+
+  void uploadData() async {
+    UploadTask uploadTask = FirebaseStorage.instance
+        .ref("profilePictures")
+        .child(widget.userModel!.uId.toString())
+        .putFile(imageFile!);
+
+    TaskSnapshot snapshot = await uploadTask;
+
+    String? imageUrl = await snapshot.ref.getDownloadURL();
+    String? fullname = fullNameController.text.trim();
+
+    widget.userModel!.fullName = fullname;
+    widget.userModel!.profilePic = imageUrl;
+
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(widget.userModel!.uId)
+        .set(widget.userModel!.toMap())
+        .then((value) => Fluttertoast.showToast(msg: "Data uploaded!"));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext) => HomeScreen(
+                userModel: widget.userModel,
+                firebaseUser: widget.firebaseUser)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,16 +145,17 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                         (imageFile != null) ? FileImage(imageFile!) : null,
                     radius: 60,
                     child: (imageFile != null)
-                        ? Icon(
+                        ? null
+                        : Icon(
                             Icons.person,
                             size: 60,
-                          )
-                        : null),
+                          )),
               ),
               SizedBox(
                 height: 25,
               ),
               TextField(
+                controller: fullNameController,
                 decoration: InputDecoration(labelText: "Full Name"),
               ),
               SizedBox(
@@ -115,7 +164,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
               CupertinoButton(
                   color: Theme.of(context).colorScheme.secondary,
                   child: Text("Submit"),
-                  onPressed: () {}),
+                  onPressed: () {
+                    checkValues();
+                  }),
             ],
           ),
         ),

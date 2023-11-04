@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lets_chat/models/user_model.dart';
+import 'package:lets_chat/screens/home_screen.dart';
 import 'package:lets_chat/screens/sign_up_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -103,20 +104,27 @@ class _LoginScreenState extends State<LoginScreen> {
     UserCredential? credential;
 
     try {
-      await FirebaseAuth.instance
+      credential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-
     } on FirebaseAuthException catch (e) {
-      print("Exception:- " + e.code.toString());
+      print("Exception:- ${e.code}");
     }
 
-    if(credential!=null){
-      String uId= credential.user!.uid;
+    if (credential != null) {
+      String uId = credential.user!.uid;
 
-      DocumentSnapshot userData=await FirebaseFirestore.instance.collection("users").doc(uId).get();
-      UserModel userModel=UserModel.fromMap(userData.data() as Map<String, dynamic>);
+      DocumentSnapshot userData =
+          await FirebaseFirestore.instance.collection("users").doc(uId).get();
+      UserModel userModel =
+          UserModel.fromMap(userData.data() as Map<String, dynamic>);
 
       Fluttertoast.showToast(msg: "Login successful");
+
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext) => HomeScreen(
+                  userModel: userModel, firebaseUser: credential!.user!)));
     }
   }
 }
