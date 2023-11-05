@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lets_chat/models/ui_helper.dart';
 import 'package:lets_chat/models/user_model.dart';
 import 'package:lets_chat/screens/complete_profile.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -119,6 +120,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     try {
       UserCredential? credential;
 
+      UIHelper.showLoadingDialog(context, "Creating new account...");
+
       credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
 
@@ -134,14 +137,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
             .then(
               (value) => Fluttertoast.showToast(msg: "New user created!"),
             );
-        Navigator.push(
+        Navigator.popUntil(context, (route) => route.isFirst);
+        Navigator.pushReplacement(
             context,
             MaterialPageRoute(
                 builder: (BuildContext) => CompleteProfileScreen(
                     userModel: newUser, firebaseUser: credential!.user!)));
       }
     } on FirebaseAuthException catch (e) {
-      print("exception:- " + e.code.toString());
+      Navigator.pop(context);
+
+      UIHelper.showAlertDialog(
+          context, "An error occured!", e.message.toString());
+
     }
   }
 }

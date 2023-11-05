@@ -6,6 +6,9 @@ import 'package:lets_chat/models/user_model.dart';
 import 'package:lets_chat/screens/complete_profile.dart';
 import 'package:lets_chat/screens/home_screen.dart';
 import 'package:lets_chat/screens/login_screen.dart';
+import 'package:uuid/uuid.dart';
+
+var uuid = Uuid();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +21,7 @@ void main() async {
         await FirebaseHelper.getUserModelById(currentUser.uid);
     if (userModel != null) {
       runApp(MyAppLoggedIn(userModel: userModel, firebaseUser: currentUser));
-    }else{
+    } else {
       runApp(const MyApp());
     }
   } else {

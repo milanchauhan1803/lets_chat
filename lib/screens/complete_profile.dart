@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lets_chat/models/ui_helper.dart';
 import 'package:lets_chat/screens/home_screen.dart';
 
 import '../models/user_model.dart';
@@ -94,6 +95,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   }
 
   void uploadData() async {
+    UIHelper.showLoadingDialog(context, "Uploading image...");
     UploadTask uploadTask = FirebaseStorage.instance
         .ref("profilePictures")
         .child(widget.userModel!.uId.toString())
@@ -112,7 +114,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         .doc(widget.userModel!.uId)
         .set(widget.userModel!.toMap())
         .then((value) => Fluttertoast.showToast(msg: "Data uploaded!"));
-    Navigator.push(
+    Navigator.popUntil(context, (route) => route.isFirst);
+    Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (BuildContext) => HomeScreen(

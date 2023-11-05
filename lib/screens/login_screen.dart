@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lets_chat/models/ui_helper.dart';
 import 'package:lets_chat/models/user_model.dart';
 import 'package:lets_chat/screens/home_screen.dart';
 import 'package:lets_chat/screens/sign_up_screen.dart';
@@ -103,11 +104,19 @@ class _LoginScreenState extends State<LoginScreen> {
   void login(String email, String password) async {
     UserCredential? credential;
 
+    UIHelper.showLoadingDialog(context, "Logging in.....");
+
     try {
       credential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
     } on FirebaseAuthException catch (e) {
-      print("Exception:- ${e.code}");
+      //Close the loading dialog
+      Navigator.pop(context);
+
+      //Show alert dialog
+      UIHelper.showAlertDialog(
+          context, "An error occured", e.message.toString());
+
     }
 
     if (credential != null) {
@@ -119,8 +128,8 @@ class _LoginScreenState extends State<LoginScreen> {
           UserModel.fromMap(userData.data() as Map<String, dynamic>);
 
       Fluttertoast.showToast(msg: "Login successful");
-
-      Navigator.push(
+      Navigator.popUntil(context, (route) => route.isFirst);
+      Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (BuildContext) => HomeScreen(
