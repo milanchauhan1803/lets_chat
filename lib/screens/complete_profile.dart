@@ -144,15 +144,16 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 },
                 padding: EdgeInsets.zero,
                 child: CircleAvatar(
-                    backgroundImage:
-                        (imageFile != null) ? FileImage(imageFile!) : null,
-                    radius: 60,
-                    child: (imageFile != null)
-                        ? null
-                        : Icon(
-                            Icons.person,
-                            size: 60,
-                          )),
+                  backgroundImage:
+                      (imageFile != null) ? FileImage(imageFile!) : null,
+                  radius: 60,
+                  child: (imageFile != null)
+                      ? null
+                      : Icon(
+                          Icons.person,
+                          size: 60,
+                        ),
+                ),
               ),
               SizedBox(
                 height: 25,

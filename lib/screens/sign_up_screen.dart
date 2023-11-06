@@ -149,7 +149,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       UIHelper.showAlertDialog(
           context, "An error occured!", e.message.toString());
-
     }
   }
 }

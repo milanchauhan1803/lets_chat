@@ -9,6 +9,8 @@ import 'package:lets_chat/models/user_model.dart';
 import 'package:lets_chat/screens/chat_room_screen.dart';
 import 'package:lets_chat/screens/login_screen.dart';
 import 'package:lets_chat/screens/search_screen.dart';
+import 'package:lets_chat/screens/settings_screen.dart';
+import 'package:lets_chat/screens/update_profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final UserModel userModel;
@@ -30,15 +32,66 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text("Lets Chat"),
         actions: [
           IconButton(
-              onPressed: () async {
-                await FirebaseAuth.instance.signOut();
-                Navigator.popUntil(context, (route) => route.isFirst);
-                Navigator.pushReplacement(
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (BuildContext) => LoginScreen()));
+            },
+            icon: Icon(Icons.exit_to_app),
+          ),
+          PopupMenuButton<int>(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                child: Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("New group"),
+                    ],
+                  ),
+                ),
+              ),
+              PopupMenuItem(
+                child: Center(
+                  child: Text("New broadcast"),
+                ),
+              ),
+              PopupMenuItem(
+                child: Center(
+                  child: Text("Linked device"),
+                ),
+              ),
+              PopupMenuItem(
+                child: Center(
+                  child: Text("Stared messages"),
+                ),
+              ),
+              PopupMenuItem(
+                child: Center(
+                  child: Text("Payments"),
+                ),
+              ),
+              PopupMenuItem(
+                onTap: () {
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (BuildContext) => LoginScreen()));
-              },
-              icon: Icon(Icons.exit_to_app)),
+                      builder: (BuildContext) => SettingsScreen(
+                        userModel: widget.userModel,
+                        firebaseUser: widget.firebaseUser,
+                      ),
+                    ),
+                  );
+                },
+                child: const Center(
+                  child: Text("Settings"),
+                ),
+              )
+            ],
+            offset: const Offset(0, 50),
+            elevation: 5,
+          ),
         ],
       ),
       body: Container(
