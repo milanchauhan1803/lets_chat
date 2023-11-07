@@ -38,7 +38,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   void croppedImage(XFile file) async {
     CroppedFile? croppedImage = await ImageCropper.platform.cropImage(
       sourcePath: file.path,
-      compressQuality: 20,
+      compressQuality: 10,
       aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
     );
 
@@ -68,6 +68,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   void updateProfile() async {
     UIHelper.showLoadingDialog(context, "Updating profile...");
 
+    // await FirebaseStorage.instance.ref("profilePictures").delete();
     UploadTask uploadTask = FirebaseStorage.instance
         .ref("profilePictures")
         .child(widget.userModel!.profilePic.toString())

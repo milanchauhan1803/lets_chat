@@ -40,7 +40,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   cropImage(XFile file) async {
     CroppedFile? croppedImage = await ImageCropper.platform.cropImage(
       sourcePath: file.path,
-      compressQuality: 20,
+      compressQuality: 10,
       aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
     );
 

@@ -5,6 +5,8 @@ import 'package:lets_chat/main.dart';
 import 'package:lets_chat/models/chat_room_model.dart';
 import 'package:lets_chat/models/message_model.dart';
 import 'package:lets_chat/models/user_model.dart';
+import 'package:lets_chat/screens/targeted_user_profile_screen.dart';
+import 'package:lets_chat/screens/update_profile_screen.dart';
 
 class ChatRoomScreen extends StatefulWidget {
   final UserModel targetUser;
@@ -59,18 +61,30 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: Colors.grey[300],
-              backgroundImage:
-                  NetworkImage(widget.targetUser.profilePic.toString()),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Text(widget.targetUser.fullName.toString())
-          ],
+        title: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (BuildContext) => TargetedUserProfileScreen(
+                    targetedUser: widget.firebaseUser,
+                    userModel: widget.targetUser),
+              ),
+            );
+          },
+          child: Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: Colors.grey[300],
+                backgroundImage:
+                    NetworkImage(widget.targetUser.profilePic.toString()),
+              ),
+              SizedBox(
+                width: 10,
+              ),
+              Text(widget.targetUser.fullName.toString())
+            ],
+          ),
         ),
       ),
       body: SafeArea(
